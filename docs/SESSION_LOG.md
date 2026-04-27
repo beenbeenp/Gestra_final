@@ -173,3 +173,38 @@ Create a temporary external action state for Player 1
 
 ### Next smallest step
 - Run a one-person pilot capture, not a full dataset collection: record a few short landmark samples for each action class and verify that full-body landmarks are stable enough for labeling.
+
+## 2026-04-26
+
+### Full pipeline implementation
+
+#### What changed
+- Created Python 3.12 venv with all dependencies (pygame, mediapipe, opencv, torch, scikit-learn).
+- Added `motion/named_action.py`: maps 5 named actions (idle/forward/backward/punch/kick) to Street-Pyter's nested input list shape.
+- Added `motion/stub_action.py`: deterministic cycling action provider for smoke testing without webcam/ML.
+- Modified `game_base/Street-Pyter/lib.py`: added `action_provider` parameter to `Character.__init__`, added `external_action_input()` method, and branched `get_input()` to use it when an action provider is set.
+- Modified `game_base/Street-Pyter/main.py`: added `GESTRA_WEBCAM=1` and `GESTRA_STUB_ACTION=1` env-var-gated paths to inject external action providers into Player 1. Player 2 keyboard path unchanged.
+- Added `ml/download_data.py`: downloads HMDB51 subset (punch, kick, kick_ball, stand) from HuggingFace mirror via HTTP range requests (~50 MB instead of 2.1 GB).
+- Added `ml/extract_poses.py`: runs MediaPipe Pose Landmarker on each video clip, saves (T, 33, 3) landmark sequences as .npz files.
+- Added `ml/dataset.py`: PyTorch Dataset with hip-center + shoulder-width normalization, sliding 30-frame windows, 3-class mapping (idle/punch/kick).
+- Added `ml/model.py`: ActionLSTM — 1-layer LSTM, hidden=64, ~42k params.
+- Added `ml/train.py`: training loop with weighted cross-entropy, saves best-val checkpoint.
+- Added `ml/evaluate.py`: confusion matrix and classification report.
+- Added `motion/pose_predictor.py`: real-time webcam thread — MediaPipe → rolling buffer → LSTM → hip-velocity rule for forward/backward → 5-frame majority smoothing → thread-safe `latest_action()`.
+
+#### What worked
+- Downloaded 536 HMDB51 clips (126 punch, 130 kick, 126 kick_ball, 154 stand).
+- Extracted 452 valid pose sequences (reject rate ~16%, mostly clips with poor body visibility).
+- Trained to 77.7% val accuracy on 3-class problem (idle/punch/kick). Punch recall 86%, kick recall 65%.
+- All three game modes pass headless smoke tests: keyboard-only, stub provider, webcam provider.
+- Game integration seam is minimal: only `get_input()` has a new branch; all existing keyboard/controller code untouched.
+
+#### What failed or needs attention
+- Kick recall (65%) is lower than punch (86%) — HMDB51 kick clips are more varied (martial arts, soccer, etc.).
+- pygame + opencv-python both bundle libSDL2, producing ObjC duplicate-class warnings on macOS. Harmless but noisy.
+- Forward/backward detection relies on hip-velocity heuristic (threshold 0.004/frame). May need tuning for different camera distances.
+
+#### What still needs testing
+- Live webcam end-to-end: stand in front of camera, launch `GESTRA_WEBCAM=1 .venv/bin/python main.py`, verify punch/kick/walk trigger correct in-game actions.
+- Latency: target is <500ms from motion to in-game response.
+- Jitter: idle stance should not produce spurious punches/kicks.

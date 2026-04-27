@@ -1,0 +1,11 @@
+pygame==2.5.2
+
+opencv-contrib-python>=4.9
+mediapipe>=0.10
+
+torch>=2.2
+numpy>=1.26
+tqdm>=4.66
+scikit-learn>=1.4
+
+requests>=2.31

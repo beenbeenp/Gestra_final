@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew install *)",
+      "Bash(brew list *)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/pip *)",
+      "Bash(.venv/bin/python -m py_compile *)",
+      "Bash(.venv/bin/python -m ml.*)",
+      "Bash(.venv/bin/python -m motion.*)",
+      "Bash(.venv/bin/python -c *)",
+      "Bash(nohup *)",
+      "Bash(rm -rf data/*)",
+      "Bash(mkdir *)",
+      "Bash(du *)",
+      "Bash(file *)",
+      "Bash(tail *)"
+    ]
+  }
+}

@@ -1,25 +1,26 @@
 # NEXT TASK
 
 Task:
-Run a one-person pilot pose-capture pass, not full dataset collection.
+Live webcam end-to-end test and tuning.
 
 Scope:
-- Use `motion/pose_capture.py`
-- Stand full body in frame
-- Save a few short landmark samples for:
-  - idle
-  - forward
-  - backward
-  - punch
-  - kick
+- Launch the game with `GESTRA_WEBCAM=1`:
+  ```
+  cd game_base/Street-Pyter
+  GESTRA_WEBCAM=1 ../../.venv/bin/python main.py
+  ```
+- Stand full body in frame (~2.5m from camera)
+- Test each action: idle, punch, kick, step forward, step backward
+- Measure perceived latency (target <500ms)
+- Check for idle jitter (false punch/kick triggers)
 
-Constraints:
-- do not connect pose output to the game yet
-- do not train a model yet
-- do not collect the full dataset yet
-- keep the camera setup consistent during the pilot
+Tuning if needed:
+- Adjust `HIP_VX_THRESHOLD` in `motion/pose_predictor.py` for forward/backward sensitivity
+- Adjust `SMOOTHING_WINDOW` (currently 5) if actions feel sluggish or jittery
+- If kick recall is too low in practice, consider retraining with more epochs or augmented data
 
 Done when:
-- each action has at least one short saved JSON sample
-- saved samples contain nonzero MediaPipe pose landmark frames
-- camera framing and lighting are judged good enough for a later dataset pass
+- 8/10 intended punches trigger in-game punch
+- 7/10 intended kicks trigger in-game kick
+- Idle stance produces no spurious attacks for 10+ seconds
+- Forward/backward steps are visibly distinguishable

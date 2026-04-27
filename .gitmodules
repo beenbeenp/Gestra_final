@@ -1,0 +1,3 @@
+[submodule "game_base/Street-Pyter"]
+	path = game_base/Street-Pyter
+	url = https://github.com/IvanJ530/Street-Pyter.git
