@@ -15,9 +15,9 @@ DEFAULT_SCHEDULE = [
     ("idle", 0.8),
     ("backward", 0.6),
     ("idle", 0.8),
-    ("punch", 0.3),
+    ("lpunch", 0.3),
     ("idle", 1.0),
-    ("kick", 0.3),
+    ("rpunch", 0.3),
     ("idle", 1.5),
 ]
 
