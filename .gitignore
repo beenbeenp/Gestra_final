@@ -20,6 +20,7 @@ data/ntu_converted/
 data/ntu60_2d.pkl
 *.rar
 *.zip
+!gestra_submission.zip
 *.tar.gz
 *.mp4
 *.avi
