@@ -1,6 +1,6 @@
 # Gestra — Motion-Controlled Fighting Game
 
-Control a Street Fighter character against AI using your webcam. No controller, no keyboard — just sit in front of your computer and throw punches.
+Control a Street Fighter character against AI using your webcam. No controller, no keyboard — just sit in front of your computer and raise your arms to punch.
 
 ## Quick Start
 
@@ -16,17 +16,27 @@ cd game_base/Street-Pyter
 GESTRA_WEBCAM=1 ../../.venv/bin/python main.py
 ```
 
+## Startup Flow
+
+1. Camera calibration window — make sure your upper body is visible, hold still 2 seconds
+2. Quick-record prompt — press SPACE to record your moves (~30s) or ESC to skip
+3. If recorded: model retrains on your data (~20s), then starts the game
+4. Press SPACE on the menu to start the fight
+5. ESC = return to menu / quit
+
+Each time you record, your data accumulates and the model improves for your body.
+
 ## Controls
 
 | Action | How to do it |
 |--------|--------------|
-| Left punch | Quickly extend your left hand forward |
-| Right punch | Quickly extend your right hand forward |
+| Left punch | Raise your left arm above shoulder height |
+| Right punch | Raise your right arm above shoulder height |
 | Move forward | Lean your body to the right |
 | Move backward | Lean your body to the left |
 | Block | Stay still (auto-block, 70% damage reduction) |
 
-Face the screen and make sure the camera can see your upper body (head to waist). No need to stand up or have a large space.
+Face the screen. The camera only needs to see your upper body (head to shoulders).
 
 ## Game Rules
 
@@ -35,100 +45,116 @@ Face the screen and make sure the camera can see your upper body (head to waist)
 - Auto-block when not punching (only take 30% damage)
 - Punching drops your guard — attack/defense rhythm is the core strategy
 - AI randomly punches or moves every 1-3 seconds
-- Getting hit causes slight knockback, but you won't fly off screen
 - HP reaches zero = game over, press any key to restart
-
-## Startup Flow
-
-1. Camera calibration window appears → make sure your upper body is visible
-2. Stay still for 2 seconds → automatically enters the game
-3. Press space to start the fight
-4. ESC = return to menu / quit
-
-## Record Your Own Data (Improve Accuracy)
-
-The default model is trained on one person's data. Recording your own data significantly improves recognition accuracy:
-
-```bash
-# Record (~2 minutes, follow on-screen prompts)
-.venv/bin/python -m ml.record_data
-
-# Train (~1 minute)
-.venv/bin/python -m ml.train_personal
-
-# Launch the game again — it will automatically use your model
-cd game_base/Street-Pyter
-GESTRA_WEBCAM=1 ../../.venv/bin/python main.py
-```
-
-## Multi-Person Recording (Better Generalization)
-
-Have different people each record their own data, then train together:
-
-```bash
-# Each person records with their own name
-.venv/bin/python -m ml.record_data --person alice
-.venv/bin/python -m ml.record_data --person bob
-.venv/bin/python -m ml.record_data --person charlie
-
-# Combined training (automatically scans all people's data)
-.venv/bin/python -m ml.train_personal
-```
-
-The more people record, the better the model generalizes to new users. 3-5 people is enough to cover most body types.
 
 ## Project Structure
 
 ```
 Gestra_final/
 ├── game_base/Street-Pyter/    # Pygame fighting game (forked from GeeseGoo/Street-Pyter)
-│   ├── main.py                # Entry point, startup modes and game loop
-│   ├── lib.py                 # Character class, attacks, blocking, movement logic
+│   ├── main.py                # Entry point: calibration → quick-record → game loop
+│   ├── lib.py                 # Character class, attacks, blocking, movement
 │   └── settings.py            # Balance tuning (HP, damage, knockback)
 ├── motion/                    # Motion detection
-│   ├── upper_body_detector.py # Rule-based detector (punches + lean movement)
-│   ├── personal_detector.py   # ML detector (uses personal model)
-│   ├── calibration.py         # Camera calibration
-│   ├── ai_opponent.py         # AI opponent
+│   ├── calibration.py         # Camera calibration (upper body check)
+│   ├── quick_record.py        # Pre-game 30s guided recording
+│   ├── quick_train.py         # Fast retraining with weighted sampling
+│   ├── upper_body_detector.py # Rule-based detector (arm raise + lean)
+│   ├── personal_detector.py   # ML detector (TCN on personal model)
+│   ├── ai_opponent.py         # Random AI for Player 2
 │   ├── named_action.py        # Action name → game input mapping
-│   └── models/                # Model files
-├── ml/                        # Training
-│   ├── record_data.py         # Record personal data
-│   ├── train_personal.py      # Train personal model
-│   ├── debug_detection.py     # Debug tool (view real-time detection values)
-│   └── ...                    # HMDB51 related (historical, can be ignored)
+│   └── models/                # Model files (.pt, .task)
+├── ml/                        # Training pipeline
+│   ├── record_data.py         # Full recording session (~2 min)
+│   ├── train_personal.py      # Train personal model with experiment logging
+│   ├── evaluate_offline.py    # Rule-based vs TCN offline comparison
+│   └── model.py               # ActionTCN architecture
+├── notebooks/
+│   └── reproduce_figures.ipynb # Generates all report figures
+├── results/
+│   ├── experiment_log.csv     # Hyperparameter experiment results
+│   └── figures/               # Generated figures (7 PNGs)
+├── final_site/                # Local HTML blog for submission
+│   ├── index.html
+│   ├── styles.css
+│   └── assets/
 └── data/                      # Data (gitignored)
-    └── personal/              # Personal recording data
+    └── personal/              # Personal recordings (.npz)
 ```
 
-## Detection Principles
+## Detection
 
-### Rule-Based Mode (Fallback when no ML model)
+### Rule-Based Mode (fallback when no ML model)
 
-- Punch: wrist-to-shoulder distance > 1.2x shoulder width + wrist velocity > threshold
-- Movement: shoulder center horizontal offset from calibration baseline > threshold
-- Block: none of the above triggered = idle
+- Punch: either wrist rises to shoulder height + wrist velocity > threshold (whichever wrist is higher determines left/right)
+- Movement: shoulder center horizontal offset from adaptive baseline > threshold (baseline tracks slowly via exponential moving average)
+- Idle: none of the above, stabilized by 7-frame majority-vote smoothing
+- Block: idle = auto-block (70% damage reduction)
 
-### ML Mode (With personal model)
+### ML Mode (with personal model)
 
-- Input: 20-frame sliding window x 33 joints x (coordinates + velocity + acceleration) = (20, 297)
-- Model: TCN (Temporal Convolutional Network), 2 layers, 64 channels, ~176k parameters
-- Normalization: hip center zeroed + shoulder width normalized (eliminates body size differences)
+- Input: 20-frame sliding window × 9 upper-body joints × (pos + vel + acc) = (20, 81)
+- Model: TCN (Temporal Convolutional Network), 2 layers, 64 channels, ~93K parameters
+- Normalization: shoulder-center zeroed + shoulder-width scaled
 - Output: 5 classes (idle / lpunch / rpunch / forward / backward)
+
+## Full Recording (alternative to quick-record)
+
+For higher accuracy, record a full 2-minute session:
+
+```bash
+.venv/bin/python -m ml.record_data
+.venv/bin/python -m ml.train_personal
+```
+
+Multi-person recording for better generalization:
+
+```bash
+.venv/bin/python -m ml.record_data --person alice
+.venv/bin/python -m ml.record_data --person bob
+.venv/bin/python -m ml.train_personal
+```
 
 ## Environment Variables
 
 | Variable | Purpose |
 |----------|---------|
 | `GESTRA_WEBCAM=1` | Enable webcam control |
-| `GESTRA_RULES_ONLY=1` | Force rule-based detection (even if personal model exists) |
-| `GESTRA_STUB_ACTION=1` | Use fake actions for testing (no webcam needed) |
+| `GESTRA_RULES_ONLY=1` | Force rule-based detection (skip ML model) |
+| `GESTRA_STUB_ACTION=1` | Fake actions for testing (no webcam needed) |
 
 ## Dependencies
 
-- Python 3.12
-- pygame, opencv-contrib-python, mediapipe, torch, numpy
+Python 3.12 required.
 
 ```bash
 .venv/bin/pip install -r requirements.txt
 ```
+
+## Reproducing Figures
+
+```bash
+.venv/bin/jupyter notebook notebooks/reproduce_figures.ipynb
+# Run all cells — figures saved to results/figures/
+```
+
+## Experiment Log
+
+Results in `results/experiment_log.csv`. Re-run all experiments:
+
+```bash
+.venv/bin/python -m ml.train_personal --run-id LR-A --lr 1e-3 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id LR-B --lr 3e-4 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id LR-C --lr 1e-4 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id OPT-B --optimizer adamw --weight-decay 1e-4 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id OPT-C --optimizer adamw --lr 3e-4 --weight-decay 1e-4 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id BS-A --batch 8 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id BS-C --batch 32 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id WIN-A --window 10 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.train_personal --run-id WIN-C --window 30 --csv-log results/experiment_log.csv
+.venv/bin/python -m ml.evaluate_offline --csv-log results/experiment_log.csv
+```
+
+## Final Blog
+
+Open `final_site/index.html` in a browser. No external dependencies.

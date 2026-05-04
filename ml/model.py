@@ -1,12 +1,9 @@
-"""TCN for 3-class action recognition from MediaPipe pose sequences.
+"""TCN for action recognition from MediaPipe pose sequences.
 
-Small architecture tuned for ~450 clips of HMDB51 data. Uses:
-  - 2 temporal blocks (not 3) to reduce overfitting
-  - kernel_size=5 for wider receptive field per layer
-  - Global average pooling over time (more stable than last-step)
-  - Moderate dropout (0.3)
+Architecture: 2 temporal blocks, 64 channels, kernel_size=5, residual connections,
+batch normalization, global average pooling. ~93K params with 9-joint input (81-dim).
 
-Input: (batch, seq_len, 297) — position + velocity + acceleration
+Input: (batch, seq_len, feat_dim) where feat_dim = num_joints * 3 * 3
 """
 
 import torch

@@ -33,12 +33,12 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 ACTIONS = [
     ("idle", "Stand still, arms relaxed", 8),
-    ("lpunch", "Throw LEFT punches repeatedly", 12),
+    ("lpunch", "Raise LEFT arm above shoulder repeatedly", 12),
     ("idle", "Stand still again, arms relaxed", 6),
-    ("rpunch", "Throw RIGHT punches repeatedly", 12),
+    ("rpunch", "Raise RIGHT arm above shoulder repeatedly", 12),
     ("idle", "Stand still, rest", 6),
-    ("forward", "Step / lean RIGHT repeatedly", 10),
-    ("backward", "Step / lean LEFT repeatedly", 10),
+    ("forward", "Lean RIGHT repeatedly", 10),
+    ("backward", "Lean LEFT repeatedly", 10),
     ("idle", "Final idle - stand still", 6),
 ]
 

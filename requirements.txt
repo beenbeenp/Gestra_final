@@ -5,7 +5,9 @@ mediapipe>=0.10
 
 torch>=2.2
 numpy>=1.26
-tqdm>=4.66
 scikit-learn>=1.4
 
-requests>=2.31
+# Notebook / experiment analysis
+jupyter>=1.0
+pandas>=2.1
+matplotlib>=3.8

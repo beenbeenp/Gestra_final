@@ -3,12 +3,12 @@
 Street-Pyter's `Character.get_input()` returns a list of two lists:
     [[up, down, left, right], [lpunch, mpunch, hpunch, lkick, mkick, hkick]]
 
-We collapse motion-control to five named actions and map each onto that shape.
-The motion side speaks strings; the game side never touches strings.
-
-The choice of which kick / punch tier to fire is fixed for v1:
-    "punch" -> medium punch
-    "kick"  -> medium kick
+We map five named actions onto that shape:
+    "lpunch"   -> low punch (left arm raise)
+    "rpunch"   -> medium punch (right arm raise)
+    "forward"  -> walk right (or left if flipped)
+    "backward" -> walk left (or right if flipped)
+    "idle"     -> no input (auto-block)
 """
 
 ACTION_NAMES = ("idle", "lpunch", "rpunch", "forward", "backward")
@@ -31,10 +31,6 @@ def named_to_input(name, *, flip=False):
         return inp
 
     if name == "rpunch":
-        inp[1][1] = True
-        return inp
-
-    if name == "punch":
         inp[1][1] = True
         return inp
 

@@ -1,0 +1,12 @@
+run_id,model,optimizer,learning_rate,batch_size,weight_decay,window_size,epochs,train_accuracy,validation_accuracy,training_time_s,notes
+LR-A,ActionTCN,adam,0.001,16,0.0,20,60,0.9949,1.0000,27.1,
+LR-B,ActionTCN,adam,0.0003,16,0.0,20,60,0.9899,1.0000,27.1,
+LR-C,ActionTCN,adam,0.0001,16,0.0,20,60,0.9924,1.0000,27.1,
+OPT-B,ActionTCN,adamw,0.001,16,0.0001,20,60,0.9975,1.0000,27.1,
+OPT-C,ActionTCN,adamw,0.0003,16,0.0001,20,60,1.0000,1.0000,28.0,
+BS-A,ActionTCN,adam,0.001,8,0.0,20,60,0.9949,1.0000,13.8,
+BS-C,ActionTCN,adam,0.001,32,0.0,20,60,1.0000,1.0000,23.9,
+WIN-A,ActionTCN,adam,0.001,16,0.0,10,60,0.9713,1.0000,22.8,
+WIN-C,ActionTCN,adam,0.001,16,0.0,30,60,1.0000,1.0000,33.4,
+RULE,RuleBased,n/a,n/a,n/a,n/a,20,n/a,n/a,0.3673,0.0,offline eval on val split
+TCN-EVAL,ActionTCN,n/a,n/a,n/a,n/a,20,n/a,n/a,1.0000,0.0,offline eval on val split

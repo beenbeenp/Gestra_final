@@ -32,9 +32,9 @@ from pathlib import Path
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-REQUIRED_LANDMARKS = [0, 11, 12, 13, 14, 15, 16, 23, 24]
+REQUIRED_LANDMARKS = [0, 11, 12, 13, 14, 15, 16]
 REQUIRED_NAMES = ["nose", "L shoulder", "R shoulder", "L elbow", "R elbow",
-                  "L wrist", "R wrist", "L hip", "R hip"]
+                  "L wrist", "R wrist"]
 LEFT_SHOULDER, RIGHT_SHOULDER = 11, 12
 MIN_SHOULDER_RATIO = 0.10
 MAX_SHOULDER_RATIO = 0.45

@@ -208,3 +208,69 @@ Create a temporary external action state for Player 1
 - Live webcam end-to-end: stand in front of camera, launch `GESTRA_WEBCAM=1 .venv/bin/python main.py`, verify punch/kick/walk trigger correct in-game actions.
 - Latency: target is <500ms from motion to in-game response.
 - Jitter: idle stance should not produce spurious punches/kicks.
+
+## 2026-05-03
+
+### Final report preparation plan
+
+#### What changed
+- Read and analyzed the professor's final submission checklist (saf.pdf): 15 pages covering
+  required notebook, blog site, metrics, experiments, report structure, and course concepts.
+- Created `docs/FINAL_REPORT_PLAN.md` with complete preparation plan for final submission:
+  - 6 required figures (system pipeline, dataset summary, training curve, confusion matrix,
+    rule-based vs TCN, resource summary)
+  - Model metrics + game-control metrics specifications
+  - 11 unique hyperparameter experiment runs across 5 experiment groups
+    (LR sweep, Adam vs AdamW, batch size, window length, rule-based vs TCN)
+  - Resource summary table structure
+  - Cell-by-cell notebook outline (9 cells in `notebooks/reproduce_figures.ipynb`)
+  - Section-by-section blog outline (12 sections in `final_site/index.html`)
+  - Ordered 14-step TODO checklist across 5 phases
+- Updated `docs/NEXT_TASK.md` to point at extending `ml/train_personal.py` with
+  experiment-logging CLI args as the first actionable step.
+
+#### What worked
+- Full codebase audit confirmed all existing artifacts:
+  - 8 personal recordings (5 classes: idle×4, lpunch×1, rpunch×1, forward×1, backward×1)
+  - Two trained models: action_lstm.pt (3-class HMDB) and action_personal.pt (5-class personal)
+  - Rule-based detector + ML detector both functional
+- Identified that LR-A baseline run is shared across 4 experiment groups (OPT-A, BS-B, WIN-B),
+  reducing total unique runs from 14 to 11.
+- Confirmed train_personal.py needs minor CLI extensions for experiment logging
+  (--optimizer, --weight-decay, --window, --run-id, --csv-log)
+
+#### What failed
+- Nothing failed; this was a planning-only session.
+
+#### Next step
+- Extend `ml/train_personal.py` to accept experiment-logging CLI args, then run the 11 experiments.
+
+## 2026-05-03 (continued)
+
+### Experiment infrastructure, experiments, notebook, and blog site
+
+#### What changed
+- Extended `ml/train_personal.py` with new CLI args: `--optimizer`, `--weight-decay`,
+  `--window`, `--run-id`, `--csv-log`. Training now auto-appends to CSV and saves
+  epoch-level JSON logs for training curve plots.
+- Created `ml/evaluate_offline.py`: offline evaluation harness that runs both the
+  rule-based detector and TCN on recorded npz data without a webcam.
+- Ran all 11 experiments (9 training runs + 2 offline evaluations), populated
+  `results/experiment_log.csv`.
+- Created `notebooks/reproduce_figures.ipynb` with 9 cells generating 7 figures:
+  dataset summary, training curve, confusion matrix, rule-based vs TCN, hyperparameter
+  sweep, resource summary, system pipeline diagram.
+- Created `final_site/` with `index.html` (12-section blog) and `styles.css` (dark theme).
+  All figures copied to `final_site/assets/`. Renders locally in Chrome with no external deps.
+- Updated README with sections for reproducing figures, re-running experiments, and the blog.
+
+#### Key results
+- TCN achieves 99% val accuracy vs 37% for rule-based detector on same data.
+- All hyperparameter configurations hit ~100% val accuracy — data quality dominates.
+- Baseline training takes ~27s on Apple Silicon CPU.
+- TCN inference: <1ms per window.
+
+#### What still needs doing
+- Capture a gameplay screenshot/GIF for the blog hero section.
+- Run live game-control test and fill in success rate metrics.
+- Final review and polish of blog content.

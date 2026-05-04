@@ -16,6 +16,8 @@ ENV/
 data/videos/
 data/poses/
 data/raw/
+data/ntu_converted/
+data/ntu60_2d.pkl
 *.rar
 *.zip
 *.tar.gz
@@ -26,6 +28,10 @@ data/raw/
 motion/models/*.pt
 motion/models/*.pth
 !motion/models/action_personal.pt
+motion/models/epochs_*.json
+!motion/models/epochs_LR-A.json
 ml/runs/
 ml/train.log
 data/personal/
+
+notebooks/.ipynb_checkpoints/

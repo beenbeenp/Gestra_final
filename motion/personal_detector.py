@@ -31,19 +31,20 @@ from ml.model import ActionTCN
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-LEFT_HIP, RIGHT_HIP = 23, 24
 LEFT_SHOULDER, RIGHT_SHOULDER = 11, 12
+UPPER_BODY_JOINTS = [0, 11, 12, 13, 14, 15, 16, 23, 24]
+NUM_JOINTS = len(UPPER_BODY_JOINTS)
 WINDOW = 20
 COOLDOWN_FRAMES = 12
 
 
 def _normalize_frame(lm):
     out = lm.copy()
-    hip = (out[LEFT_HIP] + out[RIGHT_HIP]) * 0.5
-    out -= hip
+    shoulder_center = (out[LEFT_SHOULDER] + out[RIGHT_SHOULDER]) * 0.5
+    out -= shoulder_center
     sw = max(np.linalg.norm(out[LEFT_SHOULDER, :2] - out[RIGHT_SHOULDER, :2]), 1e-6)
     out /= sw
-    return out.astype(np.float32)
+    return out[UPPER_BODY_JOINTS].astype(np.float32)
 
 
 def _add_vel_acc(seq):
@@ -91,7 +92,7 @@ class PersonalModelDetector:
         action_names = checkpoint["action_names"]
         num_classes = checkpoint["num_classes"]
 
-        model = ActionTCN(input_dim=99 * 3, num_classes=num_classes,
+        model = ActionTCN(input_dim=NUM_JOINTS * 3 * 3, num_classes=num_classes,
                           channels=(64, 64), kernel_size=5, dropout=0.0)
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()

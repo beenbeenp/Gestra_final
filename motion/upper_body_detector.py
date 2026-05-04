@@ -1,10 +1,9 @@
 """Rule-based upper-body action detector. No ML, no training data.
 
-Works at laptop distance (~0.7-1.5m), only needs shoulders/elbows/wrists visible.
+Works at laptop distance (~0.5-1.0m), only needs shoulders/elbows/wrists visible.
 Detects actions by simple geometric rules on MediaPipe landmarks:
 
-  punch:    wrist extends far from shoulder (arm extension)
-  kick:     wrist rises above shoulder height (overhead motion)
+  punch:    wrist rises above shoulder height + wrist velocity > threshold
   forward:  shoulder center shifts right
   backward: shoulder center shifts left
   idle:     none of the above
@@ -42,15 +41,12 @@ NOSE = 0
 L_SHOULDER, R_SHOULDER = 11, 12
 L_ELBOW, R_ELBOW = 13, 14
 L_WRIST, R_WRIST = 15, 16
-L_HIP, R_HIP = 23, 24
 
-L_HIP, R_HIP = 23, 24
-
-# Thresholds
-PUNCH_EXTEND_THRESH = 1.2
-PUNCH_SPEED_THRESH = 0.08
-TILT_THRESH = 0.12             # shoulder center horizontal shift (normalized by shoulder width)
-COOLDOWN_FRAMES = 15
+# Thresholds (tuned for seated user facing laptop webcam)
+PUNCH_RAISE_THRESH = 0.0       # wrist at or above shoulder center (normalized by shoulder width)
+PUNCH_SPEED_THRESH = 0.04
+TILT_THRESH = 0.15             # shoulder center horizontal shift — wider dead zone for idle stability
+COOLDOWN_FRAMES = 12
 
 
 class UpperBodyDetector:
@@ -111,6 +107,7 @@ class UpperBodyDetector:
         sh_x_buf = collections.deque(maxlen=10)
         baseline_sh_x = None
         cooldown = 0
+        action_buf = collections.deque(maxlen=7)  # smoothing buffer
 
         with PoseLandmarker.create_from_options(options) as landmarker:
             while self._running:
@@ -142,9 +139,12 @@ class UpperBodyDetector:
                 sh_center_y = (ls[1] + rs[1]) * 0.5
 
                 # Track shoulder center x for tilt detection
+                # Baseline updates slowly so returning to center = idle, not opposite direction
                 sh_x_buf.append(sh_center_x)
                 if baseline_sh_x is None and len(sh_x_buf) >= 8:
                     baseline_sh_x = np.mean(list(sh_x_buf))
+                elif baseline_sh_x is not None:
+                    baseline_sh_x = baseline_sh_x * 0.95 + sh_center_x * 0.05
 
                 # Wrist distances from shoulders (normalized by shoulder width)
                 l_dist = np.linalg.norm(lw - ls) / sh_width
@@ -168,13 +168,12 @@ class UpperBodyDetector:
                 if cooldown > 0:
                     cooldown -= 1
                 else:
-                    # Left punch: left wrist extends far + moving fast
-                    if l_dist > PUNCH_EXTEND_THRESH and wrist_speed > PUNCH_SPEED_THRESH:
-                        action = "lpunch"
-                        cooldown = COOLDOWN_FRAMES
-                    # Right punch: right wrist extends far + moving fast
-                    elif r_dist > PUNCH_EXTEND_THRESH and wrist_speed > PUNCH_SPEED_THRESH:
-                        action = "rpunch"
+                    # Punch: either wrist raised above shoulder + moving fast
+                    if (l_height < PUNCH_RAISE_THRESH or r_height < PUNCH_RAISE_THRESH) and wrist_speed > PUNCH_SPEED_THRESH:
+                        if l_height < r_height:
+                            action = "lpunch"
+                        else:
+                            action = "rpunch"
                         cooldown = COOLDOWN_FRAMES
 
                 # Forward/backward: body tilt left/right
@@ -185,8 +184,17 @@ class UpperBodyDetector:
                     elif tilt < -TILT_THRESH:
                         action = "backward"
 
+                # Smoothing: require majority vote over last 5 frames
+                # Punches bypass smoothing (they need to be responsive)
+                if action in ("lpunch", "rpunch"):
+                    smoothed = action
+                else:
+                    action_buf.append(action)
+                    counts = collections.Counter(action_buf)
+                    smoothed = counts.most_common(1)[0][0]
+
                 with self._lock:
-                    self._action = action
+                    self._action = smoothed
 
         cap.release()
 
