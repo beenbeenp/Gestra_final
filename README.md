@@ -19,7 +19,7 @@ GESTRA_WEBCAM=1 ../../.venv/bin/python main.py
 ## Startup Flow
 
 1. Camera calibration window — make sure your upper body is visible, hold still 2 seconds
-2. Quick-record prompt — press SPACE to record your moves (~30s) or ESC to skip
+2. Quick-record prompt — press SPACE to record your moves (~33s) or ESC to skip
 3. If recorded: model retrains on your data (~20s), then starts the game
 4. Press SPACE on the menu to start the fight
 5. ESC = return to menu / quit
@@ -32,8 +32,8 @@ Each time you record, your data accumulates and the model improves for your body
 |--------|--------------|
 | Left punch | Raise your left arm above shoulder height |
 | Right punch | Raise your right arm above shoulder height |
-| Move forward | Lean your body to the right |
-| Move backward | Lean your body to the left |
+| Move forward | Lean your body to the right (always moves right on screen) |
+| Move backward | Lean your body to the left (always moves left on screen) |
 | Block | Stay still (auto-block, 70% damage reduction) |
 
 Face the screen. The camera only needs to see your upper body (head to shoulders).
@@ -88,7 +88,7 @@ Gestra_final/
 
 - Punch: either wrist rises to shoulder height + wrist velocity > threshold (whichever wrist is higher determines left/right)
 - Movement: shoulder center horizontal offset from adaptive baseline > threshold (baseline tracks slowly via exponential moving average)
-- Idle: none of the above, stabilized by 7-frame majority-vote smoothing
+- Idle: none of the above, stabilized by 9-frame majority-vote smoothing
 - Block: idle = auto-block (70% damage reduction)
 
 ### ML Mode (with personal model)

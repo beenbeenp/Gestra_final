@@ -43,10 +43,10 @@ L_ELBOW, R_ELBOW = 13, 14
 L_WRIST, R_WRIST = 15, 16
 
 # Thresholds (tuned for seated user facing laptop webcam)
-PUNCH_RAISE_THRESH = 0.0       # wrist at or above shoulder center (normalized by shoulder width)
-PUNCH_SPEED_THRESH = 0.04
-TILT_THRESH = 0.15             # shoulder center horizontal shift — wider dead zone for idle stability
-COOLDOWN_FRAMES = 12
+PUNCH_RAISE_THRESH = -0.3      # wrist must be clearly above shoulder center (normalized by shoulder width)
+PUNCH_SPEED_THRESH = 0.06
+TILT_THRESH = 0.22             # shoulder center horizontal shift — wider dead zone to prevent false movement
+COOLDOWN_FRAMES = 18
 
 
 class UpperBodyDetector:
@@ -107,7 +107,7 @@ class UpperBodyDetector:
         sh_x_buf = collections.deque(maxlen=10)
         baseline_sh_x = None
         cooldown = 0
-        action_buf = collections.deque(maxlen=7)  # smoothing buffer
+        action_buf = collections.deque(maxlen=9)  # smoothing buffer
 
         with PoseLandmarker.create_from_options(options) as landmarker:
             while self._running:

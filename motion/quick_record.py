@@ -34,6 +34,7 @@ QUICK_ACTIONS = [
     ("rpunch",   "Raise RIGHT arm",  4),
     ("idle",     "Stay still",       3),
     ("forward",  "Lean RIGHT",       4),
+    ("idle",     "Stay still",       3),
     ("backward", "Lean LEFT",        4),
     ("idle",     "Stay still",       3),
 ]
@@ -76,13 +77,28 @@ def run_quick_record(camera_index=0, width=640, height=480):
         cv2.rectangle(overlay, (0, 0), (w, h), (0, 0, 0), -1)
         frame = cv2.addWeighted(overlay, 0.6, frame, 0.4, 0)
 
-        cv2.putText(frame, "QUICK CALIBRATION", (w // 2 - 180, h // 2 - 60),
+        cv2.putText(frame, "QUICK CALIBRATION", (w // 2 - 180, h // 2 - 140),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
-        cv2.putText(frame, "Record your moves to improve accuracy (~30s)",
-                    (w // 2 - 250, h // 2 - 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
+        cv2.putText(frame, "Follow the prompts to record your moves (~33s)",
+                    (w // 2 - 250, h // 2 - 100),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+
+        instructions = [
+            "1. Stand still (neutral pose)",
+            "2. Raise LEFT arm (punch)",
+            "3. Raise RIGHT arm (punch)",
+            "4. Lean RIGHT (move forward)",
+            "5. Lean LEFT (move backward)",
+            "Return to neutral between each move!",
+        ]
+        y_start = h // 2 - 60
+        for i, line in enumerate(instructions):
+            color = (255, 255, 255) if i < 5 else (0, 200, 255)
+            cv2.putText(frame, line, (w // 2 - 200, y_start + i * 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 1)
+
         cv2.putText(frame, "SPACE = Start    ESC = Skip",
-                    (w // 2 - 160, h // 2 + 30),
+                    (w // 2 - 160, h // 2 + 130),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
         cv2.imshow("Gestra - Quick Record", frame)

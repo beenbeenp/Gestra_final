@@ -102,7 +102,7 @@
     We built a recording tool that guides you through each action with on-screen prompts and
     a countdown timer. You sit in front of the webcam, press space, and follow instructions:
     stay still for a few seconds, raise your left arm repeatedly, stay still again, raise
-    your right arm, lean left, lean right. The whole thing takes about two minutes. MediaPipe
+    your right arm, lean left, lean right. The whole thing takes about 33 seconds. MediaPipe
     landmarks get saved as <code>.npz</code> files.
   </p>
   <table>
@@ -331,10 +331,11 @@
     <tr><td>Full body not detected</td><td>Laptop webcam cannot see below waist</td><td>Switched to upper-body-only (9 joints)</td></tr>
     <tr><td>Arm extension not visible</td><td>Forward motion along camera depth axis</td><td>Changed to arm raise detection (vertical signal)</td></tr>
     <tr><td>Return-to-center triggers opposite direction</td><td>Fixed baseline for lean detection</td><td>Adaptive exponential moving average baseline</td></tr>
-    <tr><td>Idle false triggers</td><td>Natural body sway</td><td>7-frame majority-vote smoothing + wider dead zone</td></tr>
+    <tr><td>Idle false triggers</td><td>Natural body sway</td><td>9-frame majority-vote smoothing + wider dead zone</td></tr>
     <tr><td>Left/right punch confusion</td><td>Mirrored webcam coordinates</td><td>Compare both wrists, assign by which is higher</td></tr>
     <tr><td>Model overfits one person</td><td>Small dataset from single user</td><td>Quick-record before each game with 3x weighting</td></tr>
     <tr><td>NTU transfer learning failed</td><td>Kinect vs MediaPipe domain gap</td><td>Abandoned; personal data only</td></tr>
+    <tr><td>Movement reverses when crossing opponent</td><td>Gesture input was tied to character facing direction</td><td>Decoupled gesture mapping from sprite flip — lean right always moves right on screen</td></tr>
   </table>
 </section>
 

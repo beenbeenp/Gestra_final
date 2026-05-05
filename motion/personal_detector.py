@@ -35,7 +35,7 @@ LEFT_SHOULDER, RIGHT_SHOULDER = 11, 12
 UPPER_BODY_JOINTS = [0, 11, 12, 13, 14, 15, 16, 23, 24]
 NUM_JOINTS = len(UPPER_BODY_JOINTS)
 WINDOW = 20
-COOLDOWN_FRAMES = 12
+COOLDOWN_FRAMES = 18
 
 
 def _normalize_frame(lm):
@@ -115,6 +115,7 @@ class PersonalModelDetector:
         )
 
         buf = collections.deque(maxlen=WINDOW)
+        action_buf = collections.deque(maxlen=7)
         frame_idx = 0
         cooldown = 0
 
@@ -156,7 +157,15 @@ class PersonalModelDetector:
                 elif action in ("lpunch", "rpunch"):
                     cooldown = COOLDOWN_FRAMES
 
+                # Smoothing: punches bypass, movement uses majority vote
+                if action in ("lpunch", "rpunch"):
+                    smoothed = action
+                else:
+                    action_buf.append(action)
+                    counts = collections.Counter(action_buf)
+                    smoothed = counts.most_common(1)[0][0]
+
                 with self._lock:
-                    self._action = action
+                    self._action = smoothed
 
         cap.release()
