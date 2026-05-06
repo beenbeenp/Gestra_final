@@ -1,16 +1,15 @@
 # NEXT TASK
 
 Task:
-Final polish — gameplay screenshot and live game-control test.
+Capture `final_site/assets/gameplay_screenshot.png` from a real Gestra gameplay run.
 
 Scope:
-- Launch the game with `GESTRA_WEBCAM=1` and capture a screenshot for the blog hero section
-- Copy screenshot to `final_site/assets/demo_screenshot.png`
-- Run live game-control test: 20 attempts per action, record success rates
-- Fill in the game-control metrics in the blog (Section 8)
-- Final review of blog content and figures
+- Launch the current game build with webcam control
+- Reach an in-game fight scene
+- Capture one clean screenshot that shows the Street-Pyter match view clearly
+- Save it as `final_site/assets/gameplay_screenshot.png`
+- Confirm the top placeholder in `final_site/index.html` is replaced by the real image
 
 Done when:
-- `final_site/assets/demo_screenshot.png` exists
-- Game-control success rates are documented in the blog
-- Blog is ready for submission
+- `final_site/assets/gameplay_screenshot.png` exists
+- The top screenshot placeholder is no longer shown in the local report page

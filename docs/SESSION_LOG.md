@@ -274,3 +274,44 @@ Create a temporary external action state for Player 1
 - Capture a gameplay screenshot/GIF for the blog hero section.
 - Run live game-control test and fill in success rate metrics.
 - Final review and polish of blog content.
+
+## 2026-05-06
+
+### Final report draft rewrite
+
+#### What changed
+- Reworked `final_site/index.html` into a stronger final-report-style draft centered on the game experience first, then motivation, system, data, features, models, experiments, limitations, ethics, and references.
+- Replaced overconfident result phrasing with more honest wording about one-person data, controlled validation splits, and the difference between offline accuracy and live control.
+- Added explicit transparency sections:
+  - measured vs not measured
+  - live game-control table marked as `DRAFT PLACEHOLDER`
+  - screenshot placeholders that stay visible when local screenshot files are missing
+- Added requested placeholder image slots for:
+  - `assets/gameplay_screenshot.png`
+  - `assets/pose_overlay.png`
+  - `assets/quick_record_screenshot.png`
+  - `assets/calibration_screenshot.png`
+- Updated `final_site/styles.css` so the report reads like a local final report page instead of a generic dark-theme demo page.
+- Updated `docs/NEXT_TASK.md` to the next smallest remaining submission task.
+
+#### What worked
+- The revised report now separates measured values from placeholders instead of mixing them together.
+- Current measured values from `results/experiment_log.csv` are reflected consistently:
+  - rule-based validation accuracy: 36.73%
+  - TCN validation accuracy: 100.00%
+  - LR / optimizer / batch / window sweeps all reaching 100.00% validation accuracy in the logged runs
+- The report now includes a references section and a short course-connection section.
+- Placeholder screenshot boxes use local paths and do not break the layout when files are absent.
+
+#### What failed
+- No new gameplay screenshots were captured in this task.
+- No live manual gameplay success-rate test was run in this task.
+- The current repo state still does not contain `data/personal/`, so the report relies on the existing notebook/report artifacts and logged results instead of re-counting raw local `.npz` files directly.
+
+#### What still needs testing
+- Open `final_site/index.html` in Chrome and visually confirm spacing, placeholder fallback rendering, and table readability.
+- Replace placeholder screenshots with real local captures.
+- Run the manual live game-control check and replace the placeholder table with measured values.
+
+#### Next smallest step
+- Capture `final_site/assets/gameplay_screenshot.png` from a real Gestra run so the top screenshot placeholder can be replaced first.
