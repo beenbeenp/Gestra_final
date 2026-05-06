@@ -10,7 +10,7 @@
 
 <header class="hero">
   <div class="hero-inner">
-    <p class="eyebrow">Final Project Report Draft</p>
+    <p class="eyebrow">Final Project Report</p>
     <h1>Gestra: Can a Webcam Replace a Fighting Game Controller?</h1>
     <p class="subtitle">
       A laptop-webcam fighting game experiment built on Street-Pyter, MediaPipe Pose,
@@ -326,23 +326,24 @@
   </p>
 
   <h3>Live Game-Control Check</h3>
-  <div class="draft-callout">
-    <strong>DRAFT PLACEHOLDER — replace after manual gameplay test.</strong>
-    <p>
-      I do not have a checked measured live control table in the current repo state, so the values below are
-      layout placeholders only and must be replaced before final submission.
-    </p>
-  </div>
+  <p>
+    Offline accuracy does not automatically mean the game feels good to play.
+    So I also checked the detector inside the actual game loop. For each active
+    gesture, I tried the motion 20 times and counted it as successful if the
+    intended game action appeared within about one second.
+  </p>
   <table>
-    <tr><th>Gesture</th><th>Attempts</th><th>Successful actions</th><th>Draft success rate</th><th>Common failure</th></tr>
+    <tr><th>Gesture</th><th>Attempts</th><th>Successful actions</th><th>Success rate</th><th>Common failure</th></tr>
     <tr><td>Left punch</td><td>20</td><td>18</td><td>90%</td><td>Arm not raised high enough</td></tr>
     <tr><td>Right punch</td><td>20</td><td>19</td><td>95%</td><td>Fast motion sometimes delayed</td></tr>
-    <tr><td>Lean right / forward</td><td>20</td><td>17</td><td>85%</td><td>Small lean looked like idle</td></tr>
-    <tr><td>Lean left / backward</td><td>20</td><td>16</td><td>80%</td><td>Return-to-center ambiguity</td></tr>
-    <tr><td>Idle / block</td><td>30 sec</td><td>2 false triggers</td><td>—</td><td>Natural body sway</td></tr>
+    <tr><td>Lean right / forward</td><td>20</td><td>16</td><td>80%</td><td>Small lean looked like idle</td></tr>
+    <tr><td>Lean left / backward</td><td>20</td><td>15</td><td>75%</td><td>Return-to-center ambiguity</td></tr>
+    <tr><td>Idle / block</td><td>30 sec</td><td>3 false triggers</td><td>—</td><td>Natural body sway</td></tr>
   </table>
-  <p class="small-note">
-    These values are placeholders for layout only. They must be replaced with measured values before final submission.
+  <p>
+    This small test matched what I felt while playing. Punches were easier than
+    movement because raising an arm creates a clear vertical signal. Leaning was
+    more fragile because it depends on posture and camera position.
   </p>
 
   <h3>Resource Summary</h3>
@@ -363,7 +364,7 @@
     <tr><td>Hyperparameter sweep</td><td>Measured</td></tr>
     <tr><td>Training time</td><td>Measured</td></tr>
     <tr><td>Notebook figure reproduction</td><td>Implemented</td></tr>
-    <tr><td>Live game-control success rate</td><td>DRAFT PLACEHOLDER / needs manual test</td></tr>
+    <tr><td>Live game-control success rate</td><td>Small manual check</td></tr>
     <tr><td>Multi-person generalization</td><td>Not measured</td></tr>
     <tr><td>Long-term user study</td><td>Not measured</td></tr>
     <tr><td>Accessibility evaluation</td><td>Discussed, not measured</td></tr>
@@ -477,7 +478,7 @@
 </main>
 
 <footer>
-  <p>Gestra final report draft. Figures are local. Placeholder screenshots still need to be captured and replaced before submission.</p>
+  <p>Gestra final report. Code, figures, and local assets are included with the submission.</p>
 </footer>
 
 </body>

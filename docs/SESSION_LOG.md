@@ -315,3 +315,39 @@ Create a temporary external action state for Player 1
 
 #### Next smallest step
 - Capture `final_site/assets/gameplay_screenshot.png` from a real Gestra run so the top screenshot placeholder can be replaced first.
+
+## 2026-05-06 (near-final polish)
+
+### Final report wording cleanup
+
+#### What changed
+- Updated `final_site/index.html` to remove report-level `Draft` wording.
+- Changed the hero label from `Final Project Report Draft` to `Final Project Report`.
+- Replaced the live gameplay placeholder block with a small manual-check section and the provided values:
+  - left punch: 18 / 20
+  - right punch: 19 / 20
+  - lean right / forward: 16 / 20
+  - lean left / backward: 15 / 20
+  - idle / block: 3 false triggers in 30 seconds
+- Updated the measured-vs-not-measured table so live game-control success rate is now labeled `Small manual check`.
+- Updated the footer to a near-final submission line.
+- Kept all screenshot placeholder boxes in place for missing local images.
+- Updated `docs/NEXT_TASK.md` to the next smallest remaining task: capture `gameplay_screenshot.png` and `pose_overlay.png`.
+
+#### What worked
+- The report now reads like a near-final submission page without changing the model results.
+- Honest limitation language is still present:
+  - one-person data
+  - controlled validation split
+  - offline accuracy is not the same as live game feel
+- Screenshot placeholder behavior remains intact for the missing local images.
+
+#### What failed
+- No new screenshots were captured in this step.
+
+#### What still needs testing
+- Open `final_site/index.html` in Chrome and verify the updated gameplay section spacing and placeholder fallback rendering.
+- Capture and add the missing screenshots.
+
+#### Next smallest step
+- Capture `final_site/assets/gameplay_screenshot.png` and `final_site/assets/pose_overlay.png`.
