@@ -60,6 +60,21 @@ body {
   color: var(--muted);
 }
 
+.repo-link {
+  margin-top: 14px;
+  font-size: 0.95rem;
+}
+
+.repo-link a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-soft);
+}
+
+.repo-link a:hover {
+  border-bottom-color: var(--accent);
+}
+
 main {
   max-width: 920px;
   margin: 0 auto;
