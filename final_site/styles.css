@@ -119,6 +119,10 @@ figure {
   margin: 18px 0 16px;
 }
 
+.screenshot-card {
+  max-width: 760px;
+}
+
 img,
 object.report-image {
   width: 100%;

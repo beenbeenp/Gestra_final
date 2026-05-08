@@ -351,3 +351,24 @@ Create a temporary external action state for Player 1
 
 #### Next smallest step
 - Capture `final_site/assets/gameplay_screenshot.png` and `final_site/assets/pose_overlay.png`.
+
+## 2026-05-08
+
+### Origin-history report edit
+
+#### What changed
+- Added a short origin-history paragraph to `final_site/index.html` in `How the Design Evolved`.
+- Added the earlier prototype screenshot:
+  - `final_site/assets/gesture_game_origin.png`
+- Added an evolution-table row explaining the move from a simple two-player hand-gesture game to Street-Pyter.
+- Added the earlier repository link to both the origin paragraph and references:
+  - `https://github.com/beenbeenp/Gesture-Game-main`
+- Added a small `.screenshot-card` style so the origin screenshot stays secondary to the final gameplay screenshot.
+- Updated `docs/NEXT_TASK.md` because the previous screenshot-capture task is now stale.
+
+#### What stayed unchanged
+- Experiment numbers were not changed.
+- The rule-based detector, TCN, hyperparameter sweep, live game-control table, NTU discussion, model architecture, and code were not changed.
+
+#### Next smallest step
+- Open `final_site/index.html` locally and do one final visual pass before submission.

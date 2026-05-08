@@ -378,8 +378,29 @@
     This project changed a lot during implementation. The clean final pipeline came after several ideas failed
     or turned out to be less practical than they looked at first.
   </p>
+  <p>
+    Gestra did not start as a fighting game. Our first version was a much smaller
+    two-player hand-gesture game, saved in the earlier
+    <a href="https://github.com/beenbeenp/Gesture-Game-main">Gesture-Game-main</a>
+    repository. That version was useful because it showed that webcam gestures
+    could feel like game input. But it was also too small for the final project.
+    The actions were limited, and there was not enough room to study timing,
+    failure cases, or whether a learned model was really better than simple rules.
+    So we moved the idea into Street-Pyter, where the same gesture problem became
+    a richer control task: punch, move, block, take damage, and fight an AI
+    opponent.
+  </p>
+
+  <figure class="screenshot-card">
+    <img src="assets/gesture_game_origin.png" alt="Earlier hand-gesture game prototype screenshot">
+    <figcaption>
+      Earlier hand-gesture game prototype before the project moved to Street-Pyter.
+    </figcaption>
+  </figure>
+
   <table>
     <tr><th>Initial plan</th><th>What went wrong</th><th>Final decision</th></tr>
+    <tr><td>Simple two-player hand-gesture game</td><td>It was fun, but too small to test a richer ML control system</td><td>Street-Pyter fighting game with webcam motion control</td></tr>
     <tr><td>Full-body motion control</td><td>Laptop webcam could not see the whole body reliably</td><td>Upper-body control only</td></tr>
     <tr><td>Arm extension = punch</td><td>Depth-axis motion was hard to see in 2D webcam view</td><td>Arm raise = punch</td></tr>
     <tr><td>Hip-center normalization</td><td>Hips were noisy or near the frame edge</td><td>Shoulder-center normalization</td></tr>
@@ -472,6 +493,9 @@
     </li>
     <li>
       GeeseGoo. <em>Street-Pyter</em>. Base fighting game repository used for Gestra integration.
+    </li>
+    <li>
+      Earlier prototype repository: <a href="https://github.com/beenbeenp/Gesture-Game-main"><em>Gesture-Game-main</em></a>.
     </li>
   </ol>
 </section>

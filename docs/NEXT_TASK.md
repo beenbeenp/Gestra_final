@@ -1,15 +1,15 @@
 # NEXT TASK
 
 Task:
-Capture `gameplay_screenshot.png` and `pose_overlay.png`.
+Do one final local visual check of the report page before submission.
 
 Scope:
-- Launch the current Gestra build and reach a clean in-game fight scene
-- Save one gameplay screenshot to `final_site/assets/gameplay_screenshot.png`
-- Save one webcam pose-overlay screenshot to `final_site/assets/pose_overlay.png`
-- Confirm both top placeholder boxes are replaced in the local report page
+- Open `final_site/index.html` in a browser.
+- Confirm the final gameplay screenshot is still the main visual.
+- Confirm `gesture_game_origin.png` appears only as a smaller origin-history screenshot in `How the Design Evolved`.
+- Confirm all report screenshots load from `final_site/assets/`.
 
 Done when:
-- `final_site/assets/gameplay_screenshot.png` exists
-- `final_site/assets/pose_overlay.png` exists
-- Both corresponding placeholders are no longer shown in `final_site/index.html`
+- No screenshot placeholders are visible.
+- The origin-history section reads as background, not as the main project focus.
+- The submission zip has been refreshed after any final edits.
