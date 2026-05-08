@@ -14,7 +14,7 @@
     <h1>Gestra: Can a Webcam Replace a Fighting Game Controller?</h1>
     <p class="subtitle">
       A laptop-webcam fighting game experiment built on Street-Pyter, MediaPipe Pose,
-      a rule-based baseline, and a small personal TCN model.
+      a rule-based baseline, and a small single-user TCN model.
     </p>
     <p class="repo-link"><a href="https://github.com/beenbeenp/Gestra_final">GitHub Repository</a></p>
   </div>
@@ -24,7 +24,7 @@
 
 <section id="hook">
   <p>
-    I started this project from the game side, not the model side. The idea was simple:
+    We started this project from the game side, not the model side. The idea was simple:
     sit in front of a laptop, raise an arm, and make a fighting game character punch.
     Lean to one side, and the character should move. Stay still, and the character should block.
     No controller, no keyboard, just the webcam.
@@ -61,7 +61,7 @@
   <p>
     There is also an accessibility angle, but with limits. A camera-based interface could help some
     players who do not want to use a controller. At the same time, it can exclude players with limited
-    upper-body mobility. So I do not want to oversell it as "more accessible" in a general sense.
+    upper-body mobility. So we do not want to oversell it as "more accessible" in a general sense.
     It is better to say it is an alternative interface idea with real tradeoffs.
   </p>
 </section>
@@ -72,22 +72,22 @@
     Motion-controlled games are not new. The Wii made simple body motion into mainstream game input,
     and Kinect pushed this further with full-body skeleton tracking. Those systems mattered because they
     showed that body motion can be a real game input method, not just a gimmick. But they also relied on
-    dedicated hardware. My project asks what happens if I try to do a much smaller version of that idea
+    dedicated hardware. Our project asks what happens if we try to do a much smaller version of that idea
     with only a laptop webcam.
   </p>
   <p>
     For pose extraction, this project uses MediaPipe Pose / BlazePose through the Pose Landmarker API.
     It gives 33 landmarks per frame from a single RGB camera, which is enough to try upper-body action
-    control without depth hardware. For sequence modeling, I ended up using a Temporal Convolutional
+    control without depth hardware. For sequence modeling, we ended up using a Temporal Convolutional
     Network (TCN) after first thinking about an LSTM/RNN design. Bai, Kolter, and Koltun (2018) argue
     that temporal convolutions are a strong alternative to recurrent models for sequence tasks, and that
     matched this project well because the game loop only needs a short fixed window.
   </p>
   <p>
-    I also tried to learn from a larger public skeleton-action dataset: NTU RGB+D. It is a strong dataset
+    We also tried to learn from a larger public skeleton-action dataset: NTU RGB+D. It is a strong dataset
     for action recognition, but it came from Kinect-style skeletons, not laptop webcam MediaPipe landmarks.
     That difference turned out to matter a lot more than raw dataset size. The base game code comes from
-    Street-Pyter, which I modified only enough to let Player 1 receive named actions from the webcam side.
+    Street-Pyter, which we modified only enough to let Player 1 receive named actions from the webcam side.
   </p>
 </section>
 
@@ -136,10 +136,10 @@
     </figcaption>
   </figure>
   <p>
-    The final personal dataset uses 5 classes: <code>idle</code>, <code>lpunch</code>,
+    The final single-user dataset uses 5 classes: <code>idle</code>, <code>lpunch</code>,
     <code>rpunch</code>, <code>forward</code>, and <code>backward</code>. The recordings are
     stored as <code>.npz</code> files containing MediaPipe pose landmarks and valid-frame masks.
-    The important point is that this dataset is small and personal. It is not a large benchmark dataset.
+    The important point is that this dataset is small and user-specific. It is not a large benchmark dataset.
   </p>
   <table>
     <tr><th>Property</th><th>Current value</th><th>Status</th></tr>
@@ -150,8 +150,8 @@
     <tr><td>Input shape</td><td>20 × 81</td><td>Measured from training code</td></tr>
   </table>
   <p>
-    The quick-record flow is my practical answer to the one-person limitation. Instead of pretending
-    that a tiny personal dataset is general, the system can ask the next user to record a short personal
+    The quick-record flow is our practical answer to the one-person limitation. Instead of pretending
+    that a tiny single-user dataset is general, the system can ask the next user to record a short calibration
     sample before play. That is not a full solution, but it fits the real problem better than pretending
     a public skeleton dataset would solve everything for free.
   </p>
@@ -160,11 +160,11 @@
     <object type="image/png" data="assets/quick_record_screenshot.png" class="report-image">
       <div class="placeholder-box">
         <strong>[SCREENSHOT PLACEHOLDER: quick_record_screenshot.png]</strong>
-        <p>The quick-record step asks the player to record a short personal calibration set before playing.</p>
+        <p>The quick-record step asks the player to record a short calibration set before playing.</p>
       </div>
     </object>
     <figcaption>
-      The quick-record step asks the player to record a short personal calibration set before playing.
+      The quick-record step asks the player to record a short calibration set before playing.
     </figcaption>
   </figure>
 
@@ -184,8 +184,8 @@
 <section id="features">
   <h2>Features</h2>
   <p>
-    MediaPipe gives 33 pose landmarks, but I do not use all of them. The final system keeps only 9 upper-body
-    joints: nose, shoulders, elbows, wrists, and hips. This was a practical decision. At first, I thought
+    MediaPipe gives 33 pose landmarks, but we do not use all of them. The final system keeps only 9 upper-body
+    joints: nose, shoulders, elbows, wrists, and hips. This was a practical decision. At first, we thought
     full-body tracking would be more impressive. It was not practical with a laptop webcam. The lower body was
     often off-frame, and the extra joints added noise instead of helping.
   </p>
@@ -216,7 +216,7 @@
     The first playable version did not need any training data. The rule-based detector checks whether a wrist
     is above shoulder height for punches, and whether shoulder-center position shifts left or right for movement.
     Otherwise it outputs idle. This baseline mattered because it made the full pipeline testable before the model
-    worked. It also made debugging easier because I could separate game-integration bugs from training bugs.
+    worked. It also made debugging easier because we could separate game-integration bugs from training bugs.
   </p>
   <p>
     The problem is that fixed thresholds are brittle. Different sitting heights, camera angles, and body proportions
@@ -224,14 +224,14 @@
     as the final answer.
   </p>
 
-  <h3>Improved Model: Personal TCN</h3>
+  <h3>Improved Model: Single-User TCN</h3>
   <p>
-    The final learned model is a small TCN trained on personal webcam recordings. It takes a 20-frame pose sequence,
+    The final learned model is a small TCN trained on single-user webcam recordings. It takes a 20-frame pose sequence,
     uses 2 temporal blocks with 64 channels, and has about 93,701 parameters. The output is one of the same 5 action
     classes used by the game integration code.
   </p>
   <p>
-    The design changed over time. Early on I thought an LSTM/RNN would be the natural choice for sequence data.
+    The design changed over time. Early on we thought an LSTM/RNN would be the natural choice for sequence data.
     In practice, the TCN fit the final use case better. The time window is short, the model is simple to run on each
     window independently, and there is no hidden state to carry through the game loop. That made real-time integration
     simpler.
@@ -245,7 +245,7 @@
   <figure>
     <img src="assets/rule_vs_tcn.png" alt="Rule-based versus TCN comparison">
     <figcaption>
-      Offline validation comparison between the rule-based detector and the personal TCN.
+      Offline validation comparison between the rule-based detector and the single-user TCN.
     </figcaption>
   </figure>
   <p>
@@ -253,8 +253,8 @@
     <strong>36.73%</strong> validation accuracy for the rule-based detector and
     <strong>100.00%</strong> validation accuracy for the TCN on the same validation split.
     This is a big gap, but it needs an honest interpretation. It does <em>not</em> mean the
-    model generalizes to everyone. It means the model fit a controlled split from one person's
-    personal webcam recordings much better than fixed thresholds did.
+    model generalizes to everyone. It means the model fit a controlled split from one recorded user's
+    webcam data much better than fixed thresholds did.
   </p>
 
   <h3>Training Curve</h3>
@@ -266,9 +266,9 @@
   </figure>
   <p>
     The baseline run converges quickly. In the saved epoch log, validation accuracy first reaches
-    100% at epoch 24, then reaches it repeatedly later. This is good for the personal-use case, but
+    100% at epoch 24, then reaches it repeatedly later. This is good for the single-user calibration case, but
     it is also a warning sign. On a small dataset, fast convergence can also mean overfitting risk.
-    So I do not want to present the curve as "problem solved." It is better to read it as
+    So we do not want to present the curve as "problem solved." It is better to read it as
     "the model can fit this setup very well, but the setup is narrow."
   </p>
 
@@ -276,12 +276,12 @@
   <figure>
     <img src="assets/confusion_matrix.png" alt="Confusion matrix">
     <figcaption>
-      Confusion matrix for the personal TCN on the validation split.
+      Confusion matrix for the single-user TCN on the validation split.
     </figcaption>
   </figure>
   <p>
-    The confusion matrix for the current personal TCN is effectively perfect on this controlled split.
-    That looks impressive, but the same caution applies here. A perfect confusion matrix on one personal
+    The confusion matrix for the current single-user TCN is effectively perfect on this controlled split.
+    That looks impressive, but the same caution applies here. A perfect confusion matrix on one user-specific
     validation split is not the same thing as robust motion control for new users or new camera setups.
   </p>
 
@@ -310,16 +310,16 @@
 
   <h3>NTU RGB+D Transfer Attempt</h3>
   <p>
-    This was an important negative result. I expected that a larger public skeleton dataset would help,
+    This was an important negative result. We expected that a larger public skeleton dataset would help,
     but the domain gap was too large. The current checked source for these numbers is the project history,
-    not <code>experiment_log.csv</code>, so I am keeping them clearly scoped to that experiment record:
+    not <code>experiment_log.csv</code>, so we are keeping them clearly scoped to that experiment record:
   </p>
   <table>
     <tr><th>Approach</th><th>Reported result</th><th>Status</th></tr>
     <tr><td>NTU data only</td><td>57%</td><td>Measured in project history</td></tr>
-    <tr><td>NTU + personal combined</td><td>56%</td><td>Measured in project history</td></tr>
-    <tr><td>NTU pretrain, then fine-tune on personal</td><td>97%</td><td>Measured in project history</td></tr>
-    <tr><td>Personal data only</td><td>100%</td><td>Measured in project history / current CSV trend</td></tr>
+    <tr><td>NTU + single-user combined</td><td>56%</td><td>Measured in project history</td></tr>
+    <tr><td>NTU pretrain, then fine-tune on single-user data</td><td>97%</td><td>Measured in project history</td></tr>
+    <tr><td>Single-user data only</td><td>100%</td><td>Measured in project history / current CSV trend</td></tr>
   </table>
   <p>
     The public dataset was bigger, but it was not closer to the problem. Kinect skeletons and MediaPipe
@@ -329,8 +329,8 @@
   <h3>Live Game-Control Check</h3>
   <p>
     Offline accuracy does not automatically mean the game feels good to play.
-    So I also checked the detector inside the actual game loop. For each active
-    gesture, I tried the motion 20 times and counted it as successful if the
+    So we also checked the detector inside the actual game loop. For each active
+    gesture, we tried the motion 20 times and counted it as successful if the
     intended game action appeared within about one second.
   </p>
   <table>
@@ -342,7 +342,7 @@
     <tr><td>Idle / block</td><td>30 sec</td><td>3 false triggers</td><td>—</td><td>Natural body sway</td></tr>
   </table>
   <p>
-    This small test matched what I felt while playing. Punches were easier than
+    This small test matched our playtesting experience. Punches were easier than
     movement because raising an arm creates a clear vertical signal. Leaning was
     more fragile because it depends on posture and camera position.
   </p>
@@ -384,8 +384,8 @@
     <tr><td>Arm extension = punch</td><td>Depth-axis motion was hard to see in 2D webcam view</td><td>Arm raise = punch</td></tr>
     <tr><td>Hip-center normalization</td><td>Hips were noisy or near the frame edge</td><td>Shoulder-center normalization</td></tr>
     <tr><td>LSTM / RNN sequence model</td><td>Real-time integration was simpler without hidden state</td><td>TCN</td></tr>
-    <tr><td>Public skeleton pretraining</td><td>Kinect vs MediaPipe domain gap</td><td>Quick-record personal data</td></tr>
-    <tr><td>Fixed thresholds</td><td>Brittle across users and setups</td><td>Learned personal TCN + adaptive baseline</td></tr>
+    <tr><td>Public skeleton pretraining</td><td>Kinect vs MediaPipe domain gap</td><td>Quick-record in-domain data</td></tr>
+    <tr><td>Fixed thresholds</td><td>Brittle across users and setups</td><td>Learned single-user TCN + adaptive baseline</td></tr>
   </table>
 </section>
 
@@ -413,9 +413,9 @@
     <tr><td>Arm extension invisible</td><td>Depth-axis motion</td><td>Arm raise detection</td></tr>
     <tr><td>Idle false triggers</td><td>Body sway</td><td>Smoothing</td></tr>
     <tr><td>Lean ambiguity</td><td>Posture and camera variation</td><td>Adaptive baseline</td></tr>
-    <tr><td>Rule detector weak</td><td>Fixed thresholds</td><td>Personal TCN</td></tr>
-    <tr><td>Overfitting</td><td>One-person data</td><td>Quick-record / future multi-person data</td></tr>
-    <tr><td>NTU transfer failed</td><td>Domain gap</td><td>Use personal in-domain data</td></tr>
+    <tr><td>Rule detector weak</td><td>Fixed thresholds</td><td>Single-user TCN</td></tr>
+    <tr><td>Overfitting</td><td>One-person data</td><td>Quick-record / future multi-user data</td></tr>
+    <tr><td>NTU transfer failed</td><td>Domain gap</td><td>Use in-domain webcam data</td></tr>
   </table>
 </section>
 
@@ -425,7 +425,7 @@
     This project ended up matching the course pipeline pretty directly: data collection, feature design,
     model choice, train/validation split, loss and accuracy curves, confusion matrix, hyperparameter tuning,
     and then a downstream task where the prediction actually changes system behavior. That last part made the
-    project more interesting for me, because a model metric that looks good in a notebook can still feel bad
+    project more interesting for us, because a model metric that looks good in a notebook can still feel bad
     in a real interaction loop.
   </p>
 </section>
