@@ -33,17 +33,11 @@
     The hard part is that fighting games need fast and precise input, but human motion is messy.
     A person who thinks they are sitting still is still moving a little. A webcam also sees only
     a 2D image, so some motions that feel obvious to a human are not obvious to the system.
-    This project is about that gap between "action classification works offline" and
-    "game control feels usable in real time."
+    That made us realize that good offline accuracy is not the same thing as control that feels playable.
   </p>
 
   <figure>
-    <object type="image/png" data="assets/gameplay_screenshot.png" class="report-image">
-      <div class="placeholder-box">
-        <strong>[SCREENSHOT PLACEHOLDER: gameplay_screenshot.png]</strong>
-        <p>Gestra running inside Street-Pyter. Player 1 is controlled by webcam gestures, while Player 2 is controlled by the built-in AI opponent.</p>
-      </div>
-    </object>
+    <img src="assets/gameplay_screenshot.png" alt="Gestra gameplay controlled by webcam gestures">
     <figcaption>
       Gestra running inside Street-Pyter. Player 1 is controlled by webcam gestures, while Player 2 is controlled by the built-in AI opponent.
     </figcaption>
@@ -61,8 +55,8 @@
   <p>
     There is also an accessibility angle, but with limits. A camera-based interface could help some
     players who do not want to use a controller. At the same time, it can exclude players with limited
-    upper-body mobility. So we do not want to oversell it as "more accessible" in a general sense.
-    It is better to say it is an alternative interface idea with real tradeoffs.
+    upper-body mobility. So we do not want to oversell it as more accessible in a general sense.
+    It is more like an alternative interface idea with real tradeoffs.
   </p>
 </section>
 
@@ -72,16 +66,15 @@
     Motion-controlled games are not new. The Wii made simple body motion into mainstream game input,
     and Kinect pushed this further with full-body skeleton tracking. Those systems mattered because they
     showed that body motion can be a real game input method, not just a gimmick. But they also relied on
-    dedicated hardware. Our project asks what happens if we try to do a much smaller version of that idea
-    with only a laptop webcam.
+    dedicated hardware. We tried a much smaller version of that idea with only a laptop webcam.
   </p>
   <p>
     For pose extraction, this project uses MediaPipe Pose / BlazePose through the Pose Landmarker API.
     It gives 33 landmarks per frame from a single RGB camera, which is enough to try upper-body action
     control without depth hardware. For sequence modeling, we ended up using a Temporal Convolutional
     Network (TCN) after first thinking about an LSTM/RNN design. Bai, Kolter, and Koltun (2018) argue
-    that temporal convolutions are a strong alternative to recurrent models for sequence tasks, and that
-    matched this project well because the game loop only needs a short fixed window.
+    that temporal convolutions are a strong alternative to recurrent models for sequence tasks. That fit
+    our use case because the game loop only needs a short fixed window.
   </p>
   <p>
     We also tried to learn from a larger public skeleton-action dataset: NTU RGB+D. It is a strong dataset
@@ -96,11 +89,11 @@
   <figure>
     <img src="assets/system_pipeline.png" alt="Gestra system pipeline">
     <figcaption>
-      End-to-end pipeline: webcam to pose landmarks to features to action prediction to game input.
+      End-to-end pipeline from webcam to pose landmarks to features to action prediction to game input.
     </figcaption>
   </figure>
   <p>
-    The full runtime pipeline is:
+    At runtime, the system works roughly like this.
   </p>
   <p class="pipeline-line">
     Webcam → MediaPipe Pose → 9 upper-body joints → normalization + velocity + acceleration
@@ -108,19 +101,14 @@
     → character action
   </p>
   <p>
-    This matters because Gestra is a real-time ML system, not only a classifier notebook.
-    The detector has to keep running while the game runs. It also has to map its output into the
-    game's input format in a stable way. That is why smoothing, cooldowns, and action mapping show up
-    in the project almost as much as the model itself.
+    The hard part was not just getting a model prediction in a notebook. The detector had to keep working
+    while the game was running. It also had to send actions in a way Street-Pyter could handle without
+    feeling jumpy. This part mattered more than I expected. Smoothing, cooldowns, and action mapping
+    ended up taking almost as much time as the model.
   </p>
 
   <figure>
-    <object type="image/png" data="assets/pose_overlay.png" class="report-image">
-      <div class="placeholder-box">
-        <strong>[SCREENSHOT PLACEHOLDER: pose_overlay.png]</strong>
-        <p>MediaPipe pose landmarks over the webcam image. This helped us see what the model actually receives.</p>
-      </div>
-    </object>
+    <img src="assets/pose_overlay.png" alt="MediaPipe pose landmarks over webcam image">
     <figcaption>
       MediaPipe pose landmarks over the webcam image. This helped us see what the model actually receives.
     </figcaption>
@@ -139,7 +127,7 @@
     The final single-user dataset uses 5 classes: <code>idle</code>, <code>lpunch</code>,
     <code>rpunch</code>, <code>forward</code>, and <code>backward</code>. The recordings are
     stored as <code>.npz</code> files containing MediaPipe pose landmarks and valid-frame masks.
-    The important point is that this dataset is small and user-specific. It is not a large benchmark dataset.
+    The main thing to know is that this dataset is small and user-specific. It is not a large benchmark dataset.
   </p>
   <table>
     <tr><th>Property</th><th>Current value</th><th>Status</th></tr>
@@ -150,31 +138,21 @@
     <tr><td>Input shape</td><td>20 × 81</td><td>Measured from training code</td></tr>
   </table>
   <p>
-    The quick-record flow is our practical answer to the one-person limitation. Instead of pretending
+    Quick-record was our practical fix for the one-person data problem. Instead of pretending
     that a tiny single-user dataset is general, the system can ask the next user to record a short calibration
     sample before play. That is not a full solution, but it fits the real problem better than pretending
     a public skeleton dataset would solve everything for free.
   </p>
 
   <figure>
-    <object type="image/png" data="assets/quick_record_screenshot.png" class="report-image">
-      <div class="placeholder-box">
-        <strong>[SCREENSHOT PLACEHOLDER: quick_record_screenshot.png]</strong>
-        <p>The quick-record step asks the player to record a short calibration set before playing.</p>
-      </div>
-    </object>
+    <img src="assets/quick_record_screenshot.png" alt="Quick-record calibration screen">
     <figcaption>
       The quick-record step asks the player to record a short calibration set before playing.
     </figcaption>
   </figure>
 
   <figure>
-    <object type="image/png" data="assets/calibration_screenshot.png" class="report-image">
-      <div class="placeholder-box">
-        <strong>[SCREENSHOT PLACEHOLDER: calibration_screenshot.png]</strong>
-        <p>Camera calibration before gameplay. The system checks that the upper body is visible at normal laptop distance.</p>
-      </div>
-    </object>
+    <img src="assets/calibration_screenshot.png" alt="Camera calibration before gameplay">
     <figcaption>
       Camera calibration before gameplay. The system checks that the upper body is visible at normal laptop distance.
     </figcaption>
@@ -202,9 +180,9 @@
     <li>Stack 20 frames into one input window.</li>
   </ol>
   <p>
-    So the final model input is <code>20 × 81</code>. This part connects directly to the course:
-    data becomes features, features become a sequence input, and that sequence is used for a downstream
-    control task instead of only a static prediction benchmark.
+    So the final model input is <code>20 × 81</code>. This is where the project connects to the course:
+    we collected data, turned it into features, and used the sequence prediction to control something
+    in a game.
   </p>
 </section>
 
@@ -215,7 +193,7 @@
   <p>
     The first playable version did not need any training data. The rule-based detector checks whether a wrist
     is above shoulder height for punches, and whether shoulder-center position shifts left or right for movement.
-    Otherwise it outputs idle. This baseline mattered because it made the full pipeline testable before the model
+    Otherwise it outputs idle. This baseline was useful because it made the full pipeline testable before the model
     worked. It also made debugging easier because we could separate game-integration bugs from training bugs.
   </p>
   <p>
@@ -252,7 +230,7 @@
     The current offline evaluation in <code>results/experiment_log.csv</code> reports
     <strong>36.73%</strong> validation accuracy for the rule-based detector and
     <strong>100.00%</strong> validation accuracy for the TCN on the same validation split.
-    This is a big gap, but it needs an honest interpretation. It does <em>not</em> mean the
+    The gap is big, but I do not want to overclaim it. It does <em>not</em> mean the
     model generalizes to everyone. It means the model fit a controlled split from one recorded user's
     webcam data much better than fixed thresholds did.
   </p>
@@ -268,8 +246,8 @@
     The baseline run converges quickly. In the saved epoch log, validation accuracy first reaches
     100% at epoch 24, then reaches it repeatedly later. This is good for the single-user calibration case, but
     it is also a warning sign. On a small dataset, fast convergence can also mean overfitting risk.
-    So we do not want to present the curve as "problem solved." It is better to read it as
-    "the model can fit this setup very well, but the setup is narrow."
+    So we do not want to act like the curve means the problem is solved. I read it as
+    the model can fit this setup very well, but the setup is narrow.
   </p>
 
   <h3>Confusion Matrix</h3>
@@ -281,7 +259,7 @@
   </figure>
   <p>
     The confusion matrix for the current single-user TCN is effectively perfect on this controlled split.
-    That looks impressive, but the same caution applies here. A perfect confusion matrix on one user-specific
+    It looks good, but it is also easy to misunderstand. A perfect confusion matrix on one user-specific
     validation split is not the same thing as robust motion control for new users or new camera setups.
   </p>
 
@@ -293,10 +271,9 @@
     </figcaption>
   </figure>
   <p>
-    The sweep results are almost too clean. All logged TCN training runs in the current CSV reached
-    100.00% validation accuracy, including:
-    LR-A, LR-B, LR-C, OPT-B, OPT-C, BS-A, BS-C, WIN-A, and WIN-C.
-    What changed more than accuracy was training time and final training accuracy. The main takeaway is that
+    The sweep was less interesting than I expected. All logged TCN training runs in the current CSV reached
+    100.00% validation accuracy. The runs were LR-A, LR-B, LR-C, OPT-B, OPT-C, BS-A, BS-C, WIN-A, and WIN-C.
+    What changed more than accuracy was training time and final training accuracy. For us, the lesson was that
     almost every reasonable configuration could fit this small dataset, so data quality mattered more than
     optimizer tuning.
   </p>
@@ -310,9 +287,9 @@
 
   <h3>NTU RGB+D Transfer Attempt</h3>
   <p>
-    This was an important negative result. We expected that a larger public skeleton dataset would help,
-    but the domain gap was too large. The current checked source for these numbers is the project history,
-    not <code>experiment_log.csv</code>, so we are keeping them clearly scoped to that experiment record:
+    This was useful even though it failed. We expected that a larger public skeleton dataset would help,
+    but the domain gap was too large. These numbers came from the project history,
+    not <code>experiment_log.csv</code>, so we kept them scoped to that experiment record:
   </p>
   <table>
     <tr><th>Approach</th><th>Reported result</th><th>Status</th></tr>
@@ -328,7 +305,7 @@
 
   <h3>Live Game-Control Check</h3>
   <p>
-    Offline accuracy does not automatically mean the game feels good to play.
+    The model could look good offline, but the game still had to feel playable.
     So we also checked the detector inside the actual game loop. For each active
     gesture, we tried the motion 20 times and counted it as successful if the
     intended game action appeared within about one second.
@@ -339,10 +316,10 @@
     <tr><td>Right punch</td><td>20</td><td>19</td><td>95%</td><td>Fast motion sometimes delayed</td></tr>
     <tr><td>Lean right / forward</td><td>20</td><td>16</td><td>80%</td><td>Small lean looked like idle</td></tr>
     <tr><td>Lean left / backward</td><td>20</td><td>15</td><td>75%</td><td>Return-to-center ambiguity</td></tr>
-    <tr><td>Idle / block</td><td>30 sec</td><td>3 false triggers</td><td>—</td><td>Natural body sway</td></tr>
+    <tr><td>Idle / block</td><td>30 sec</td><td>3 false triggers</td><td>n/a</td><td>Natural body sway</td></tr>
   </table>
   <p>
-    This small test matched our playtesting experience. Punches were easier than
+    This matched what we felt while playtesting. Punches were easier than
     movement because raising an arm creates a clear vertical signal. Leaning was
     more fragile because it depends on posture and camera position.
   </p>
@@ -375,7 +352,7 @@
 <section id="evolution">
   <h2>How the Design Evolved</h2>
   <p>
-    This project changed a lot during implementation. The clean final pipeline came after several ideas failed
+    This project changed a lot during implementation. The final pipeline only came after several ideas failed
     or turned out to be less practical than they looked at first.
   </p>
   <p>
@@ -413,7 +390,7 @@
 <section id="ai-needed">
   <h2>Was AI Needed?</h2>
   <p>
-    The honest answer is: not at first. AI was not needed for the first playable demo.
+    Honestly, not at first. AI was not needed for the first playable demo.
     The rule-based detector was enough to prove that webcam motion could control the game at all.
     That baseline was useful because it gave the project a working version before the model worked.
   </p>
@@ -443,7 +420,7 @@
 <section id="course">
   <h2>Course Connection</h2>
   <p>
-    This project ended up matching the course pipeline pretty directly: data collection, feature design,
+    In the end, this project matched the course pipeline pretty directly: data collection, feature design,
     model choice, train/validation split, loss and accuracy curves, confusion matrix, hyperparameter tuning,
     and then a downstream task where the prediction actually changes system behavior. That last part made the
     project more interesting for us, because a model metric that looks good in a notebook can still feel bad

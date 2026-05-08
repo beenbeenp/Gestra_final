@@ -123,8 +123,7 @@ figure {
   max-width: 760px;
 }
 
-img,
-object.report-image {
+img {
   width: 100%;
   max-width: 100%;
   display: block;
@@ -137,39 +136,6 @@ figcaption {
   margin-top: 8px;
   font-size: 0.95rem;
   color: var(--muted);
-}
-
-.placeholder-box {
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  padding: 22px;
-  border: 2px dashed #c58f74;
-  border-radius: 12px;
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      #fcf1e8,
-      #fcf1e8 16px,
-      #f7e6d8 16px,
-      #f7e6d8 32px
-    );
-  color: var(--strong);
-}
-
-.placeholder-box strong {
-  font-size: 1.05rem;
-}
-
-.draft-callout {
-  margin: 16px 0;
-  padding: 14px 16px;
-  border: 1px solid #c47a4f;
-  border-left: 5px solid #c45b29;
-  border-radius: 10px;
-  background: #fff0e6;
 }
 
 .small-note {
@@ -252,10 +218,6 @@ footer {
   section {
     padding: 22px 18px;
     border-radius: 14px;
-  }
-
-  .placeholder-box {
-    min-height: 240px;
   }
 
   table,
