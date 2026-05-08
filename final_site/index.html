@@ -103,7 +103,7 @@
   <p>
     The hard part was not just getting a model prediction in a notebook. The detector had to keep working
     while the game was running. It also had to send actions in a way Street-Pyter could handle without
-    feeling jumpy. This part mattered more than I expected. Smoothing, cooldowns, and action mapping
+    feeling jumpy. This part mattered more than we expected. Smoothing, cooldowns, and action mapping
     ended up taking almost as much time as the model.
   </p>
 
@@ -139,9 +139,10 @@
   </table>
   <p>
     Quick-record was our practical fix for the one-person data problem. Instead of pretending
-    that a tiny single-user dataset is general, the system can ask the next user to record a short calibration
-    sample before play. That is not a full solution, but it fits the real problem better than pretending
-    a public skeleton dataset would solve everything for free.
+    that a tiny single-user dataset is general, the system asks each new user to record a short sample
+    (~33 seconds) before play, then trains a fresh personal model on the spot (~20 seconds). Each time
+    the user records again, the data accumulates and the model improves. That is not a full solution,
+    but it fits the real problem better than pretending a public skeleton dataset would solve everything for free.
   </p>
 
   <figure>
@@ -230,7 +231,7 @@
     The current offline evaluation in <code>results/experiment_log.csv</code> reports
     <strong>36.73%</strong> validation accuracy for the rule-based detector and
     <strong>100.00%</strong> validation accuracy for the TCN on the same validation split.
-    The gap is big, but I do not want to overclaim it. It does <em>not</em> mean the
+    The gap is big, but we do not want to overclaim it. It does <em>not</em> mean the
     model generalizes to everyone. It means the model fit a controlled split from one recorded user's
     webcam data much better than fixed thresholds did.
   </p>
@@ -246,7 +247,7 @@
     The baseline run converges quickly. In the saved epoch log, validation accuracy first reaches
     100% at epoch 24, then reaches it repeatedly later. This is good for the single-user calibration case, but
     it is also a warning sign. On a small dataset, fast convergence can also mean overfitting risk.
-    So we do not want to act like the curve means the problem is solved. I read it as
+    So we do not want to act like the curve means the problem is solved. We read it as
     the model can fit this setup very well, but the setup is narrow.
   </p>
 
@@ -271,7 +272,7 @@
     </figcaption>
   </figure>
   <p>
-    The sweep was less interesting than I expected. All logged TCN training runs in the current CSV reached
+    The sweep was less interesting than we expected. All logged TCN training runs in the current CSV reached
     100.00% validation accuracy. The runs were LR-A, LR-B, LR-C, OPT-B, OPT-C, BS-A, BS-C, WIN-A, and WIN-C.
     What changed more than accuracy was training time and final training accuracy. For us, the lesson was that
     almost every reasonable configuration could fit this small dataset, so data quality mattered more than
